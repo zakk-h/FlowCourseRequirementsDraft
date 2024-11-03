@@ -13,3 +13,5 @@ greedy approach: pick the course that has the most codes that you need right now
 but, if they're duplicates, then wouldn't they if they chose 1 node with a certain weight, then they'd have to choose the rest of them because if it chose it, that is the best way to get the codes it needs, so then it would choose all the rest of the same class.
 
 the only catch is if a class has say the same codes and the same weight, and then they could mix and match, so we'd have to enforce that it stays with the same class, and perhaps the best way to do that is do something like in MSTS when we add small amounts to each weight to make it unique
+
+to be clear, if we have weights, we'd have to make the same number of copies of each class, like LCM whatever because our algorithm that we are assuming to exist with the integer linear programming optimization is just counting nodes.
