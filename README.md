@@ -22,3 +22,5 @@ other disguised applications: transportation networks: suppliers or warehouses t
 
 another problem - minimize bandwidth usage in routing data between multiple points. data centers go through routers to get to end users or other data centers.
 
+other interesting algorithms: binary search on the number of classes needed 1 to all_classes and brute force within each number. really, we know that it is lower bounded by 10 because 5x2 and we expect it isn't much higher, but we can't get insights like this with weights
+
