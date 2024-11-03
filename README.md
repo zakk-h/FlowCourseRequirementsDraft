@@ -17,3 +17,8 @@ the only catch is if a class has say the same codes and the same weight, and the
 to be clear, if we have weights, we'd have to make the same number of copies of each class, like LCM whatever because our algorithm that we are assuming to exist with the integer linear programming optimization is just counting nodes.
 
 or we could minimize straightout: \text{minimize } \sum_{i=1}^n w_i \cdot x_i
+
+other disguised applications: transportation networks: suppliers or warehouses to customer demand points, with intermediate layers being distribution centers or other constraints. you want to get the max flow, but you also want to minimize the cost, and edge weights might be the cost to transport whatever you want to transport there. this is a harder problem because the cost would differ if you shipped things in bulk.
+
+another problem - minimize bandwidth usage in routing data between multiple points. data centers go through routers to get to end users or other data centers.
+
