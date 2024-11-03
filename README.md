@@ -15,3 +15,5 @@ but, if they're duplicates, then wouldn't they if they chose 1 node with a certa
 the only catch is if a class has say the same codes and the same weight, and then they could mix and match, so we'd have to enforce that it stays with the same class, and perhaps the best way to do that is do something like in MSTS when we add small amounts to each weight to make it unique
 
 to be clear, if we have weights, we'd have to make the same number of copies of each class, like LCM whatever because our algorithm that we are assuming to exist with the integer linear programming optimization is just counting nodes.
+
+or we could minimize straightout: \text{minimize } \sum_{i=1}^n w_i \cdot x_i
