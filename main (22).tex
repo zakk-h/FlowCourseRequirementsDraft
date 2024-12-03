@@ -1,0 +1,257 @@
+\documentclass{beamer}
+
+% Theme and Packages
+\usepackage{graphicx}
+%\usetheme{Boadilla}
+%\usetheme{Antibes}
+%\usetheme{Berlin}
+%\usetheme{Copenhagen}
+\usetheme{Malmoe}
+
+
+\title{\textbf{Graph Modeling: Network Flows to Inform Course Selection}}
+\author{\textbf{Zakk Heile and Isaac Yang} \ (Duke University)}
+\date{\textbf{December 11, 2024}}
+
+\begin{document}
+
+% Title Slide
+\begin{frame}
+    \titlepage
+\end{frame}
+
+% Slide: Overview of Problems
+\begin{frame}{Overview of Problems}
+    \begin{itemize}
+        \item Check if a selection of classes satisfies distribution requirements.
+        \item Find the \textbf{minimum number} of classes to satisfy requirements.
+        \item Optimize class selection to minimize time commitment or maximize enjoyment while satisfying requirements.
+        \item Given an existing selection of classes, determine optimal ways to satisfy constraints.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Modeling Course Selection}
+    \centering
+    \LARGE We model the Course Selection problem as a Max Flow problem.
+\end{frame}
+
+% Slide for initialexample1.png with citation
+\begin{frame}
+    \centering
+    \includegraphics[width=\textwidth]{initialexample1.png}
+    \vspace{0.5cm}
+    \tiny{Cited from Michael Sambol}
+\end{frame}
+
+% Slide for initialexample2.png
+\begin{frame}
+    \centering
+    \includegraphics[width=\textwidth]{initialexample2.png}
+\end{frame}
+
+% Slide for initialexample3.png
+\begin{frame}
+    \centering
+    \includegraphics[width=\textwidth]{initialexample3.png}
+\end{frame}
+
+% Slide for initialexample4.png
+\begin{frame}
+    \centering
+    \includegraphics[width=\textwidth]{initialexample4.png}
+\end{frame}
+
+% Slide for initialexample5.png
+\begin{frame}
+    \centering
+    \includegraphics[width=\textwidth]{initialexample5.png}
+\end{frame}
+
+% Slide for initialexample6.png
+\begin{frame}
+    \centering
+    \includegraphics[width=\textwidth]{initialexample6.png}
+\end{frame}
+
+% Slide for initialexample7.png
+\begin{frame}
+    \centering
+    \includegraphics[width=\textwidth]{initialexample7.png}
+    \tiny (This is not a max flow, more steps to do but we leave it here). Time complexity: $O(f \cdot E)$ or $O(V \cdot E)$
+\end{frame}
+
+% Slide: Architecture
+\begin{frame}{Architecture}
+    \begin{itemize}
+        \item \textbf{Source Node}: Connects to class nodes (infinite capacity).
+        \item \textbf{Class Nodes}: Link to specific general requirement nodes (specific to the course):
+        \begin{itemize}
+            \item Modes of Inquiry
+            \item Areas of Knowledge
+            \item Seminar Requirements
+        \end{itemize}
+        \item \textbf{Requirement Nodes}: Flow general requirement nodes to shared nodes (e.g., SS, CCI).
+        \item \textbf{Sink Node}: Collects all flow to confirm requirement satisfaction.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \centering
+    \includegraphics[width=\textwidth]{architecture.png}
+\end{frame}
+
+
+% Slide: Constraints
+\begin{frame}{Constraints}
+    \begin{itemize}
+        \item Classes may fulfill multiple Modes of Inquiry (up to 3) or Areas of Knowledge (1).
+        \item Given that courses may be coded with more than that amount, many allocations are possible for given classes, complicating flow conservation.
+        \item \textbf{Foreign Languages}: Special rules:
+        \begin{itemize}
+            \item 3 courses at 100/200 level, or
+            \item 1 course at 300+ level, which satisfies all 3 requirements.
+        \end{itemize}
+        \item Complex conservation rules:
+        \begin{itemize}
+            \item A 300+ level foreign language course fulfills the Foreign Language requirement with weight 3 without penalizing other Modes of Inquiry or Areas of Knowledge.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \centering
+    \includegraphics[width=\textwidth]{FLproblem.png}
+\end{frame}
+
+% Slide: Binning
+\begin{frame}{Binning}
+    \begin{itemize}
+        \item Many classes share the same codes, increasing the complexity of graph construction and max flow computation.
+        \item Solution: Bin classes into sets of codes, focusing on the sets needed to satisfy requirements.
+        \item A set of codes may be used multiple times (up to the number of available classes).
+        \item Additional upper bounds for code set usage:
+        \begin{itemize}
+            \item \( 2 \times \text{numNonFLcodes} + 3 \times \text{ifFLCode} \)
+            \item 12 (I can construct 12 courses to graduate)
+        \end{itemize}
+        \item How many copies? Minimum of all 3 of those bounds.
+    \end{itemize}
+\end{frame}
+
+% Slide: Handling Pre-Taken Classes
+\begin{frame}{Handling Already-Taken Classes}
+    \begin{itemize}
+        \item Codes used from already-taken classes are not fixed but can be assigned in multiple ways.
+        \item Assign codes in all possible ways for the given classes:
+        \begin{itemize}
+            \item Possibilities for a class: \( \binom{4}{3} \) or \( \binom{2}{1} \), or rarely their product.
+        \end{itemize}
+        \item For each assignment:
+        \begin{itemize}
+            \item Build a graph, push flow through the assigned codes.
+            \item Remove the used flow and reduce capacity accordingly.
+            \item Decrease the remaining max flow required for graduation.
+        \end{itemize}
+        \item Evaluate all graphs and max flows and select the best.
+    \end{itemize}
+\end{frame}
+
+% Slide for phase1.png
+\begin{frame}{Handling Already-Taken Classes Efficiently}
+    \centering
+    \includegraphics[width=\textwidth]{phase1.png}
+    \vspace{0.5cm}
+    \small Idea: restrict valid \( s \)-to-\( t \) paths.
+\end{frame}
+
+% Slide for phase2.png
+\begin{frame}
+    \centering
+    \includegraphics[width=\textwidth]{phase2.png}
+    \vspace{0.5cm}
+    \small This path is allowed, but backtracking to the course is not.
+\end{frame}
+
+% Slide: Enumerating All Max Flows
+\begin{frame}{Enumerating All Max Flows}
+    \begin{itemize}
+        \item During max flow computation, at each iteration:
+        \begin{itemize}
+            \item Identify all possible \( s \)-to-\( t \) augmenting paths.
+            \item For each path, branch into a new state by pushing flow along that path.
+        \end{itemize}
+        \item Recursively explore all branches, maintaining flow conservation and capacity constraints.
+        \item Keep only the unique max flow distributions.
+        \item Note: smartly choosing \( s \)-to-\( t \) paths can improve efficiency. For example, when there is still a path to get more codes on a class already locked in, don't explore new classes. 
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Finding All Maximum Flows Elegantly}
+    \begin{itemize}
+        \item Given two maximum flows \( f_1 \) and \( f_2 \):
+        \begin{itemize}
+            \item \( f' = f_2 - f_1 \) is a circulation (\( \sum_{u \in V} f'_{uv} - \sum_{u \in V} f'_{vu} = 0 \)).
+        \end{itemize}
+        \item Thus, any two max flows differ by a circulation!
+        \item Thus, if we have a max flow and can find all circulations, we can get every other max flow.
+        \item Non-trivial circulations correspond to cycles in the residual graph:
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Finding Max Flows with Minimum Classes}
+    \begin{itemize}
+        \item Goal: Identify maximum flows that use the smallest number of classes.
+        \item If we compute all the max flows then we just need to filter out the ones using more than the minimum number of classes.
+        \item This approach is computational, but there is no easy way to find all max flows subject to a constraint without it (that we can come up with).
+        \item We want all max flows (specifically with bins) because there are not that many (if our upper bound on bin copies is tight) and the user may have a preference (I would!).
+    \end{itemize}
+\end{frame}
+
+%TO DO - MAX FLOW SUBJECT  to minimizing number of classes, more detail on foreign language, actually code something to show
+
+\begin{frame}{Revisiting Foreign Language Gadgets}
+    \begin{itemize}
+        \item \textbf{Key Insight:} If we compute all max flows, we can handle the Foreign Language (FL) constraints flexibly.
+        \item \textbf{Strategy for 300 Level \(\leq\) 2nd class:}
+        \begin{itemize}
+            \item Include both FL gadgets:
+            \begin{itemize}
+                \item Capacity 3 with no FL option.
+                \item Capacity 2 MOI no FL with Capacity 3 FL.
+            \end{itemize}
+        \end{itemize}
+        \item \textbf{Process:}
+        \begin{enumerate}
+            \item Compute all possible max flows.
+            \item Filter out flows that:
+            \begin{itemize}
+                \item Send partial flow to both gadgets.
+            \end{itemize}
+            \item Minimize objectives or return among the valid flows.
+        \end{enumerate}
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+    \centering
+    \includegraphics[width=\textwidth]{newfl.png}
+    \tiny{We want to allow backtracking and switching between gadgets, unlike taken courses.}
+\end{frame}
+
+% Slide: Conclusion
+\begin{frame}{Conclusion}
+    \begin{itemize}
+        \item Network flow models provide a powerful framework to optimize course selection even with obtuse constraints.
+
+        \item Future work will focus on refining optimization techniques and algorithm efficiency. 
+    \end{itemize}
+    \vspace{1cm}
+    \textbf{Contact Information:}
+    \begin{itemize}
+        \item Zakk Heile, Duke '27: \texttt{zakk.heile@duke.edu}
+        \item Isaac Yang, Duke '26: \texttt{isaac.y@dukekunshan.edu.cn}
+    \end{itemize}
+\end{frame}
+
+\end{document}
